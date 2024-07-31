@@ -2,6 +2,7 @@ import express from 'express';
 import cors from'cors';
 import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import staffRoutes from './routes/staffRoutes.js';
 const app = express();
 const PORT = 3001;
 
@@ -16,11 +17,9 @@ app.get('/', (req, res) => {
 // Middleware
 app.use(express.json());
 
-// Routes
 app.use('/get', userRoutes);
-
-// Routes
 app.use('/send', notificationRoutes);
+app.use('/staff', staffRoutes);
 
 // Start the server
 app.listen(PORT, () => {

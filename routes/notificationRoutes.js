@@ -1,9 +1,9 @@
 import express from 'express';
-import sendNotification from '../controllers/notificationController.js';
+import scheduleNotification from '../controllers/notificationController.js';
 
 
 const router = express.Router();
 
-router.get('/:id/:msg', sendNotification);
+router.get('/', scheduleNotification);
 
 export default router;

@@ -1,5 +1,8 @@
 // npm install axios
 import axios from 'axios';
+import cron from 'node-cron';
+import getCourseDetails from './getCourse.js';
+// import { getCourseName, getCourseDate } from '../controllers/getCourse.js';
 
 // for emailnotifier.kesug.com
 // const API_KEY = "ODk5NDUzNjUtMzBkZS00ZTNiLWE3YWUtMWY5M2JhNWRiN2Iy";
@@ -9,9 +12,11 @@ import axios from 'axios';
 const API_KEY = "MmE3NDY2ZWQtYmMxZi00ZDczLWIxYTYtNDQ2YjVkZmE2OTEx";
 const ONE_SIGNAL_APP_ID = "4b7035fa-afda-4657-ab5f-033b8408a9a1";
 
-export default async function sendNotification(req, res) {
-    const { id, msg } = req.params;   
-    const strmessage = String(msg);
+// Function used by cron job to schedule notifications
+function sendNotification(name, id, course, startdate) {
+    const [date, time] = startdate.split('T');
+    const [hour, minute, second] = time.split(':');
+    const strmessage = `This is a message from TSH reminding ${name} to go for you course named ${course} at the start date ${date} at ${hour}:${minute}`;
     try {
         console.log(strmessage);
         // Format notification payload based on user data
@@ -29,20 +34,66 @@ export default async function sendNotification(req, res) {
         // console.log('Notification payload:', JSON.stringify(notificationPayload, null, 2));
 
         // Send notification using Axios
-        const response = await axios.post('https://onesignal.com/api/v1/notifications', notificationPayload, {
+        const response = axios.post('https://onesignal.com/api/v1/notifications', notificationPayload, {
             headers: {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Authorization': `Basic ${API_KEY}`
             }
         });
-
-        const reply = response.data;
         // Log the response data
-        console.log('Notification sent, notification id is:', reply);
-        res.json({reply});
+        console.log(`Notification sent to ${name}`);
     } catch (error) {
         console.error('Error sending notification:', error.response ? error.response.data : error.message);
-        res.status(500).json({ message: 'Error fetching recent subscriptions', error: error.message });
+    }
+}
+
+// Schedule the task
+export default async function scheduleNotification(req, res) {
+    try {
+        const notif_to_be_scheduled = await getCourseDetails();
+        console.log(notif_to_be_scheduled);
+        const currentYear = new Date().getFullYear();
+        let errors = [];
+        for (let i = 0; i < notif_to_be_scheduled.length; i++) {
+            try {
+                const name = notif_to_be_scheduled[i].staff_name;
+                const startdate = notif_to_be_scheduled[i].startDate;
+                const course = notif_to_be_scheduled[i].course_name;
+                console.log(name, startdate, course);
+                // Splitting the date and time
+                const [date, time] = startdate.split('T');
+                const [year, month, day] = date.split('-');
+                const [hour, minute, second] = time.split(':');
+                console.log(date, time, year, month, day);
+                // TODO: NEED TO CHECK IF THERE IS EXISTING ID AND NAME MATCH in you database! 
+                const id = "d493c70e-9845-4c66-8524-80742b616db1";
+                const year_int = parseInt(year, 10);
+                const job = cron.schedule(`${minute} ${hour} ${day} ${month} *`, () => {
+                    // TODO: need to check for when to send notification. 3 days before/immediately
+                    // Checks if the year of all notifications sent are either the currect year or in the future
+                    if (currentYear >= year_int) {
+                        sendNotification(name, id, course, startdate).then(() => {
+                            // Stop the job after execution
+                            job.stop();
+                            console.log('Job stopped.');
+                        });
+                    } else {
+                        console.log('Scheduled year is in the past, skipping execution.');
+                    }
+                });
+            } catch (error) {
+                console.error(`Error scheduling notification for ${notif_to_be_scheduled[i].staff_name}:`, error.message);
+                errors.push({ name: notif_to_be_scheduled[i].staff_name, error: error.message });
+            }
+        }
+        if (errors.length > 0) {
+            res.status(500).send({ message: 'Some notifications could not be scheduled', errors });
+        }
+        else {
+            res.send("All notifications sent successfully");
+        }
+    } catch (error) {
+        res.status(500).send({ message: 'Error fetching courses to be scheduled', error });
     }
 }
 
