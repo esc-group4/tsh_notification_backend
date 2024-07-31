@@ -14,4 +14,4 @@ async function cleanup() {
     await pool.end();
 }
 
-export default pool;
+export {pool, cleanup};

@@ -1,4 +1,4 @@
-import pool from './db.js';
+import * as db from './db.js';
 const tableName = 'staff';
 
 class Staff {
@@ -46,7 +46,7 @@ async function findOneByName(name) {
     }
 }
 
-async function findByDept(subscription) {
+async function findByID(subscription) {
     try {
         const [rows] = await db.pool.query(`SELECT name, subscription FROM ${tableName} WHERE subscription = ?`, [subscription]);
         return rows.map(row => new Staff(row.name, row.subscription));
@@ -62,10 +62,6 @@ async function insertOne(staff) {
         if (exists.length === 0) {
             await db.pool.query(`INSERT INTO ${tableName} (name, subscription) VALUES (?, ?)`, [staff.name, staff.subscription]);
             const [newStaff] = await findOneByName(staff.name);
-            if (newStaff.length > 0) {
-                const work = new workModel.Work(newStaff[0].name, staff.subscription);
-                await workModel.insertOne(work);    
-            }
         }
     } catch (error) {
         console.error("Database operation failed:", error);
@@ -73,11 +69,11 @@ async function insertOne(staff) {
     }
 }
 
-async function insertMany(staffs) {
-    for (let staff of staffs) {
-        await insertOne(staff);
-    }
-}
+// async function insertMany(staffs) {
+//     for (let staff of staffs) {
+//         await insertOne(staff);
+//     }
+// }
 
 async function deleteOne(staff) {
     try {
@@ -88,4 +84,4 @@ async function deleteOne(staff) {
     }
 }
 
-export { Staff, all, findOneByName, findByDept, sync, insertOne, insertMany, deleteOne };
+export { Staff, all, findOneByName, findByID, sync, insertOne, deleteOne };

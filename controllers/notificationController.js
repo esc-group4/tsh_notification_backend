@@ -2,6 +2,7 @@
 import axios from 'axios';
 import cron from 'node-cron';
 import getCourseDetails from './getCourse.js';
+import { findOneByName } from '../models/staff.js';
 // import { getCourseName, getCourseDate } from '../controllers/getCourse.js';
 
 // for emailnotifier.kesug.com
@@ -51,22 +52,29 @@ function sendNotification(name, id, course, startdate) {
 export default async function scheduleNotification(req, res) {
     try {
         const notif_to_be_scheduled = await getCourseDetails();
-        console.log(notif_to_be_scheduled);
         const currentYear = new Date().getFullYear();
         let errors = [];
         for (let i = 0; i < notif_to_be_scheduled.length; i++) {
             try {
                 const name = notif_to_be_scheduled[i].staff_name;
+                // console.log(name);
                 const startdate = notif_to_be_scheduled[i].startDate;
                 const course = notif_to_be_scheduled[i].course_name;
-                console.log(name, startdate, course);
                 // Splitting the date and time
                 const [date, time] = startdate.split('T');
                 const [year, month, day] = date.split('-');
                 const [hour, minute, second] = time.split(':');
-                console.log(date, time, year, month, day);
                 // TODO: NEED TO CHECK IF THERE IS EXISTING ID AND NAME MATCH in you database! 
-                const id = "d493c70e-9845-4c66-8524-80742b616db1";
+                const staff = await findOneByName(name);
+                // console.log(staff);
+                if (staff.length > 0) {
+                    const id = staff[0].subscription;
+                    // console.log("check passed for:", name, id);
+                }
+                else {
+                    console.log("Staff has not subscribed to push notification, skipping execution.")
+                    continue;
+                }
                 const year_int = parseInt(year, 10);
                 const job = cron.schedule(`${minute} ${hour} ${day} ${month} *`, () => {
                     // TODO: need to check for when to send notification. 3 days before/immediately
