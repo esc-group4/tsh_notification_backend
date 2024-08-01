@@ -63,6 +63,9 @@ async function insertOne(staff) {
             await db.pool.query(`INSERT INTO ${tableName} (name, subscription) VALUES (?, ?)`, [staff.name, staff.subscription]);
             const [newStaff] = await findOneByName(staff.name);
         }
+        else {
+            console.error("User is already registered.");
+        }
     } catch (error) {
         console.error("Database operation failed:", error);
         throw error;

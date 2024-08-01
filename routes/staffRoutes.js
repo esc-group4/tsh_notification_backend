@@ -14,17 +14,12 @@ router.get('/all', async function(req, res, next) {
 
 
 // Change to post!! to connect to frontend
-router.get('/submit/:name', async function(req, res, next) {
+router.get('/submit/:name/:id', async function(req, res, next) {
     console.log("submit point reached");
     try {
-        const { name } = req.params;
-        console.log("point reached");
-        // Make an API call to obtain the code
-        const response = await axios.get('http://localhost:3001/get/user');
-        console.log(response.data);
-        const subscription = response.data.recent;
-        console.log(subscription);
-        await staffModel.insertOne(staffModel.Staff.newStaff(name, subscription));
+        const { name, id } = req.params;
+        console.log(id);
+        await staffModel.insertOne(staffModel.Staff.newStaff(name, id));
         const staffs = await staffModel.all();
         // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
         res.json(staffs);
