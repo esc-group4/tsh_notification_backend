@@ -15,10 +15,8 @@ router.get('/all', async function(req, res, next) {
 
 // Change to post!! to connect to frontend
 router.get('/submit/:name/:id', async function(req, res, next) {
-    console.log("submit point reached");
     try {
         const { name, id } = req.params;
-        console.log(id);
         await staffModel.insertOne(staffModel.Staff.newStaff(name, id));
         const staffs = await staffModel.all();
         // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');

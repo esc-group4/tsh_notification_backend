@@ -5,7 +5,7 @@ const ONE_SIGNAL_APP_ID = "4b7035fa-afda-4657-ab5f-033b8408a9a1";
 // const API_KEY = "ODk5NDUzNjUtMzBkZS00ZTNiLWE3YWUtMWY5M2JhNWRiN2Iy";
 // const ONE_SIGNAL_APP_ID = "39dc6c84-8625-4449-bfd2-db8c9b58e9f0";
 
-// Used to get recent user so that we can store subscription id associated with this user in the database
+// To be removed in final, just for checking
 export default async function getRecentUser(req, res) {
   try {
         const response = await axios.get(`https://onesignal.com/api/v1/players?app_id=${ONE_SIGNAL_APP_ID}`, {

@@ -1,79 +1,89 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
 import axios from 'axios';
-import sendNotification from '../controllers/notificationController.js';
+import MockAdapter from 'axios-mock-adapter';
+import { sendNotification } from '../controllers/notificationController.js';
 
-// for emailnotifier.kesug.com
-// const API_KEY = "ODk5NDUzNjUtMzBkZS00ZTNiLWE3YWUtMWY5M2JhNWRiN2Iy";
-// const ONE_SIGNAL_APP_ID = "39dc6c84-8625-4449-bfd2-db8c9b58e9f0";
 
-// for local testing
 const API_KEY = "MmE3NDY2ZWQtYmMxZi00ZDczLWIxYTYtNDQ2YjVkZmE2OTEx";
 const ONE_SIGNAL_APP_ID = "4b7035fa-afda-4657-ab5f-033b8408a9a1";
 
 describe('sendNotification', () => {
-  let req, res, axiosPostStub;
+  let mock;
 
-  beforeEach(() => {
-    // Setup mock request and response objects
-    req = {
-      params: {
-        id: 'test-id',
-        msg: 'Notification sent to user.'
-      }
-    };
-    res = {
-      json: sinon.stub(),
-      status: sinon.stub().returnsThis()
-    };
-
-    // Stub the axios.post method
-    axiosPostStub = sinon.stub(axios, 'post');
+  beforeAll(() => {
+    mock = new MockAdapter(axios);
   });
 
   afterEach(() => {
-    // Restore the original methods
-    sinon.restore();
+    mock.reset();
   });
 
-  it('should send a notification successfully', async () => {
-    // Arrange
-    const mockResponse = { data: { id: 'notification-id' } };
-    axiosPostStub.resolves(mockResponse);
+  afterAll(() => {
+    mock.restore();
+  });
 
-    // Act
-    await sendNotification(req, res);
+  test('should send a notification with the correct payload', async () => {
+    const name = 'John Doe';
+    const id = 'some-player-id';
+    const course = 'First Aid';
+    const startdate = '2024-09-01T10:00:00Z';
 
-    // Assert
-    expect(axiosPostStub.calledOnce).to.be.true;
-    expect(axiosPostStub.firstCall.args[0]).to.equal('https://onesignal.com/api/v1/notifications');
-    expect(axiosPostStub.firstCall.args[1]).to.deep.equal({
+    const strmessage = `This is a message from TSH reminding ${name} to go for your course named ${course} at the start date ${startdate.split('T')[0]} at ${startdate.split('T')[1].split(':')[0]}:${startdate.split('T')[1].split(':')[1]}`;
+    const notificationPayload = {
       app_id: ONE_SIGNAL_APP_ID,
-      contents: { en: 'Notification sent to user.' },
-      include_player_ids: ['test-id']
-    });
-    expect(axiosPostStub.firstCall.args[2]).to.deep.equal({
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': `Basic ${API_KEY}`
-      }
-    });
-    expect(res.json.calledOnce).to.be.true;
-    expect(res.json.firstCall.args[0]).to.deep.equal({ reply: mockResponse.data });
+      contents: { en: strmessage },
+      include_player_ids: [id]
+    };
+
+    mock.onPost('https://onesignal.com/api/v1/notifications').reply(200);
+
+    const response = await sendNotification(name, id, course, startdate);
+    console.log(response);
+
+  //   expect(mock.history.post.length).toBe(1);
+  //   expect(mock.history.post[0].data).toEqual(JSON.stringify(notificationPayload));
+  //   expect(mock.history.post[0].headers).toEqual({
+  //     'Content-Type': 'application/json; charset=utf-8',
+  //     'Authorization': `Basic ${API_KEY}`
+  //   });
+  // });
+    expect(mock.history.post.length).toBe(1);
+    const request = mock.history.post[0];
+
+    // Verify the request payload
+    expect(JSON.parse(request.data)).toEqual(notificationPayload);
+
+    const headerObject = {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Authorization': `Basic ${API_KEY}`
+    };
+
+    // Validate the request headers
+    expect(request.headers['Content-Type']).toBe(headerObject['Content-Type']);
+    expect(request.headers['Authorization']).toBe(headerObject['Authorization']);
+        
+
+    // Verify the response status
+    expect(response.status).toBe(200);
   });
 
-  it('should handle errors correctly', async () => {
-    // Arrange
-    const mockError = new Error('Something went wrong');
-    axiosPostStub.rejects(mockError);
+  test('should handle errors when Axios post request fails', async () => {
+    const name = 'John Doe';
+    const id = 'some-player-id';
+    const course = 'First Aid';
+    const startdate = '2024-09-01T10:00:00Z';
 
-    // Act
-    await sendNotification(req, res);
+    // Mock the Axios post request to return an error
+    mock.onPost('https://onesignal.com/api/v1/notifications').reply(500);
 
-    // Assert
-    expect(axiosPostStub.calledOnce).to.be.true;
-    expect(res.status.calledOnceWith(500)).to.be.true;
-    expect(res.json.calledOnce).to.be.true;
-    expect(res.json.firstCall.args[0]).to.deep.equal({ message: 'Error fetching recent subscriptions', error: 'Something went wrong' });
+    try {
+      await sendNotification(name, id, course, startdate);
+      // Fail the test if no error is thrown
+      fail('Expected error not thrown');
+    } catch (error) {
+      // Check if the error is handled as expected
+      expect(error.response.status).toBe(500);
+      expect(error.message).toMatch(/Request failed with status code 500/);
+    }
   });
 });
+
