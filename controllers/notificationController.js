@@ -64,6 +64,8 @@ export async function scheduleNotification(req, res) {
                 const [hour, minute] = time.split(':');
                 const staff = await findOneByName(name);
 
+                console.log("check staff ", staff);
+
                 if (staff.length > 0) {
                     const id = staff[0].subscription;
                     const year_int = parseInt(year, 10);
@@ -71,8 +73,8 @@ export async function scheduleNotification(req, res) {
                         if (currentYear >= year_int) {
                             try {
                                 await sendNotification(name, id, course, startdate);
-                                job.stop();
                                 console.log('Job stopped.');
+                                job.stop();
                             } catch (notificationError) {
                                 console.error('Error sending notification:', notificationError.message);
                                 errors.push({ name, error: notificationError.message });
