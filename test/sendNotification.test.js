@@ -26,8 +26,9 @@ describe('sendNotification', () => {
     const id = 'some-player-id';
     const course = 'First Aid';
     const startdate = '2024-09-01T10:00:00Z';
+    const location = 'Changi South Avenue 1'
 
-    const strmessage = `This is a message from TSH reminding ${name} to go for your course named ${course} at the start date ${startdate.split('T')[0]} at ${startdate.split('T')[1].split(':')[0]}:${startdate.split('T')[1].split(':')[1]}`;
+    const strmessage = `This is a message from TSH reminding ${name} to go for your course named ${course} at the start date ${startdate.split('T')[0]} at ${startdate.split('T')[1].split(':')[0]}:${startdate.split('T')[1].split(':')[1]}. The location is at ${location}.`;
     const notificationPayload = {
       app_id: ONE_SIGNAL_APP_ID,
       contents: { en: strmessage },
@@ -36,7 +37,7 @@ describe('sendNotification', () => {
 
     mock.onPost('https://onesignal.com/api/v1/notifications').reply(200);
 
-    const response = await sendNotification(name, id, course, startdate);
+    const response = await sendNotification(name, id, course, startdate, location);
     console.log(response);
 
   //   expect(mock.history.post.length).toBe(1);

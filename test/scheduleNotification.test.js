@@ -35,6 +35,7 @@ describe('scheduleNotification', () => {
                 "staff_name": "John Doe",
                 "startDate": '2024-11-01T10:00:00.000Z',
                 "course_name": "First Aid",
+                "location": "Changi South Avenue 1"
             }
         ];
 
@@ -47,7 +48,7 @@ describe('scheduleNotification', () => {
         expect(getCourseDetails).toHaveBeenCalled();
         expect(findOneByName).toHaveBeenCalledWith('John Doe');
 
-        expect(sendNotification).toHaveBeenCalledWith('John Doe', 'some-subscription-id', 'First Aid', '2024-11-01T10:00:00.000Z');
+        expect(sendNotification).toHaveBeenCalledWith('John Doe', 'some-subscription-id', 'First Aid', '2024-11-01T10:00:00.000Z', 'Changi South Avenue 1');
         expect(mockRes.send).toHaveBeenCalledWith("All notifications scheduled successfully");
     });
 
@@ -57,6 +58,7 @@ describe('scheduleNotification', () => {
                 "staff_name": "Jane Doe",
                 "startDate": '2024-11-01T10:00:00.000Z',
                 "course_name": "CPR",
+                "location": "Changi South Avenue 1"
             }
         ];
 
@@ -67,6 +69,7 @@ describe('scheduleNotification', () => {
 
         expect(getCourseDetails).toHaveBeenCalled();
         expect(findOneByName).toHaveBeenCalledWith("Jane Doe");
+        expect(sendNotification).not.toHaveBeenCalled();
         expect(mockRes.send).toHaveBeenCalledWith("All notifications scheduled successfully");
     });
 
@@ -76,6 +79,7 @@ describe('scheduleNotification', () => {
                 "staff_name": "John Doe",
                 "startDate": '2024-11-01T10:00:00.000Z',
                 "course_name": "First Aid",
+                "location": "Changi South Avenue 1"
             }
         ];
 
@@ -87,7 +91,7 @@ describe('scheduleNotification', () => {
 
         expect(getCourseDetails).toHaveBeenCalled();
         expect(findOneByName).toHaveBeenCalledWith('John Doe');
-        expect(sendNotification).toHaveBeenCalledWith('John Doe', 'some-subscription-id', 'First Aid', '2024-11-01T10:00:00.000Z');
+        expect(sendNotification).toHaveBeenCalledWith('John Doe', 'some-subscription-id', 'First Aid', '2024-11-01T10:00:00.000Z', 'Changi South Avenue 1');
         expect(mockRes.status).toHaveBeenCalledWith(500);
         expect(mockRes.send).toHaveBeenCalledWith({
             message: 'Some notifications could not be scheduled',

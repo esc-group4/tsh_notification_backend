@@ -9,7 +9,7 @@ export async function scheduleNotification(req, res) {
         let errors = [];
 
         for (const notification of notif_to_be_scheduled) {
-            const { staff_name, startDate, course_name } = notification;
+            const { staff_name, startDate, course_name, location } = notification;
             const [date, time] = startDate.split('T');
             const [year, month, day] = date.split('-');
             const [hour, minute] = time.split(':');
@@ -24,7 +24,7 @@ export async function scheduleNotification(req, res) {
             const id = staff[0].subscription;
 
             try {
-                await sendNotification(staff_name, id, course_name, startDate);
+                await sendNotification(staff_name, id, course_name, startDate, location);
                 console.log(`Notification sent successfully for ${staff_name}.`);
             } catch (error) {
                 console.error(`Error sending notification for ${staff_name}:`, error.message);

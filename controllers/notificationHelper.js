@@ -14,10 +14,10 @@ const API_KEY = "MmE3NDY2ZWQtYmMxZi00ZDczLWIxYTYtNDQ2YjVkZmE2OTEx";
 const ONE_SIGNAL_APP_ID = "4b7035fa-afda-4657-ab5f-033b8408a9a1";
 
 // Function used by cron job to schedule notifications
-export async function sendNotification(name, id, course, startdate) {
+export async function sendNotification(name, id, course, startdate, location) {
     const [date, time] = startdate.split('T');
     const [hour, minute, second] = time.split(':');
-    const strmessage = `This is a message from TSH reminding ${name} to go for your course named ${course} at the start date ${date} at ${hour}:${minute}`;
+    const strmessage = `This is a message from TSH reminding ${name} to go for your course named ${course} at the start date ${date} at ${hour}:${minute}. The location is at ${location}.`;
     try {
         console.log(strmessage);
         // Format notification payload based on user data
