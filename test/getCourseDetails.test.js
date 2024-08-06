@@ -33,7 +33,7 @@ describe('getCourseDetails', () => {
         const result = await getCourseDetails();
 
         // Assert
-        expect(fetch).toHaveBeenCalledWith('https://66a8ceb4e40d3aa6ff59818e.mockapi.io/api/notification/push');
+        expect(fetch).toHaveBeenCalledWith('http://localhost:8080/notification');
         expect(result).toEqual(mockData);
     });
 
@@ -47,7 +47,7 @@ describe('getCourseDetails', () => {
         const result = await getCourseDetails();
 
         // Assert
-        expect(fetch).toHaveBeenCalledWith('https://66a8ceb4e40d3aa6ff59818e.mockapi.io/api/notification/push');
+        expect(fetch).toHaveBeenCalledWith('http://localhost:8080/notification');
         expect(result).toBeNull();
     });
 
@@ -59,7 +59,7 @@ describe('getCourseDetails', () => {
         const result = await getCourseDetails();
 
         // Assert
-        expect(fetch).toHaveBeenCalledWith('https://66a8ceb4e40d3aa6ff59818e.mockapi.io/api/notification/push');
+        expect(fetch).toHaveBeenCalledWith('http://localhost:8080/notification');
         expect(result).toBeNull();
     });
 });

@@ -20,9 +20,6 @@ describe('scheduleNotification', () => {
             status: jest.fn().mockReturnThis(),
             send: jest.fn(),
         };
-        findOneByName.mockReset();
-        schedule.mockReset();
-        sendNotification.mockReset();
     });
 
     afterEach(() => {
