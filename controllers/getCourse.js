@@ -2,7 +2,7 @@
 
 export async function getCourseDetails() {
     try {
-      const response = await fetch('https://66a8ceb4e40d3aa6ff59818e.mockapi.io/api/notification/push');
+      const response = await fetch('http://localhost:8080/notification');
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }

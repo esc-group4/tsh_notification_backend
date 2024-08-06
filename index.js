@@ -8,6 +8,8 @@ import * as staffModel from './models/staff.js';
 import process from 'process';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
+import axios from 'axios';
+import cron from 'node-cron';
 const app = express();
 const PORT = 3001;
 
@@ -34,6 +36,20 @@ app.use(cookieParser());
 app.use('/get', userRoutes);
 app.use('/send', notificationRoutes);
 app.use('/staff', staffRoutes);
+
+// Schedule a cron job to run daily at 9 AM
+cron.schedule('00 10 * * *', () => {
+  console.log('Sending scheduled notifications at 09:00');
+  axios.get('http://localhost:3001/send')
+    .then(response => {
+      console.log('Send route triggered:', response.data);
+    })
+    .catch(error => {
+      console.error('Error triggering send route:', error);
+    });
+}, {
+  timezone: "Asia/Singapore"
+});
 
 // Start the server
 app.listen(PORT, () => {
