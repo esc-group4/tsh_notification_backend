@@ -1,6 +1,6 @@
 import axios from 'axios';
 import MockAdapter from 'axios-mock-adapter';
-import { sendNotification } from '../controllers/notificationController.js';
+import { sendNotification } from '../controllers/notificationHelper.js';
 
 
 const API_KEY = "MmE3NDY2ZWQtYmMxZi00ZDczLWIxYTYtNDQ2YjVkZmE2OTEx";

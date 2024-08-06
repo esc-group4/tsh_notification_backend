@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.get('/all', async function(req, res, next) {
     const staffs = await staffModel.all();
-    console.log("no error to get all staff", staffs);
     // res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.send(`${JSON.stringify(staffs)}`);
 });
@@ -25,7 +24,5 @@ router.get('/submit/:name/:id', async function(req, res, next) {
         res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 });
-
-router.get('/', async function(req, res, next) {});
 
 export default router;

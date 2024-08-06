@@ -46,15 +46,15 @@ async function findOneByName(name) {
     }
 }
 
-async function findByID(subscription) {
-    try {
-        const [rows] = await db.pool.query(`SELECT name, subscription FROM ${tableName} WHERE subscription = ?`, [subscription]);
-        return rows.map(row => new Staff(row.name, row.subscription));
-    } catch (error) {
-        console.error("Database query failed:", error);
-        throw error;
-    }
-}
+// async function findByID(subscription) {
+//     try {
+//         const [rows] = await db.pool.query(`SELECT name, subscription FROM ${tableName} WHERE subscription = ?`, [subscription]);
+//         return rows.map(row => new Staff(row.name, row.subscription));
+//     } catch (error) {
+//         console.error("Database query failed:", error);
+//         throw error;
+//     }
+// }
 
 async function insertOne(staff) {
     try {
@@ -87,4 +87,4 @@ async function deleteOne(staff) {
     }
 }
 
-export { Staff, all, findOneByName, findByID, sync, insertOne, deleteOne };
+export { Staff, all, findOneByName, sync, insertOne, deleteOne };
