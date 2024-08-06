@@ -38,7 +38,7 @@ app.use('/send', notificationRoutes);
 app.use('/staff', staffRoutes);
 
 // Schedule a cron job to run daily at 9 AM
-cron.schedule('00 10 * * *', () => {
+cron.schedule('20 12 * * *', () => {
   console.log('Sending scheduled notifications at 09:00');
   axios.get('http://localhost:3001/send')
     .then(response => {
